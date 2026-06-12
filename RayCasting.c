@@ -8,7 +8,7 @@
 #define COLOR_WHITE 0xffffffff
 #define COLOR_BLACK 0x00000000
 #define COLOR_RAY 0xFFD43B
-#define RAYS_NUMBER 1000
+#define RAYS_NUMBER 500
 
 struct Circle {
   double x;
@@ -19,7 +19,6 @@ struct Circle {
 struct Ray {
   double x_start, y_start;
   double angle;
-  double x_end, y_end;
 };
 
 void FillCircle(SDL_Surface *surface, struct Circle circle, Uint32 color) {
@@ -86,10 +85,8 @@ int main()
   SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
   
   struct Circle circle = {200, 200, 40};
-  struct Circle shadow_circle = {550,300,140};
+  struct Circle shadow_circle = {(WIDTH/2),400,140};
   SDL_Rect erase_rect = (SDL_Rect){0,0, WIDTH, HEIGHT};
-
-  double obstacle_speed_y = 10;
 
   int simulation_running = 1;
   SDL_Event event;
@@ -105,6 +102,16 @@ int main()
       if (event.type == SDL_MOUSEMOTION && event.motion.state != 0) {
         circle.x = event.motion.x;
         circle.y = event.motion.y;
+        if (event.motion.y < 400) {
+          shadow_circle.y = 400 + ((400 - event.motion.y) / 10);
+        } else {
+          shadow_circle.y = 400 - ((event.motion.y - 400) / 10);
+        }
+        if (event.motion.x < 600) {
+          shadow_circle.x = 600 + ((600 - event.motion.x) / 2);
+        } else {
+          shadow_circle.x = 600 - ((event.motion.x - 600) / 2);
+        }
         generate_rays(circle,rays);
       }
     }
@@ -113,13 +120,8 @@ int main()
     FillCircle(psurface, circle,COLOR_WHITE);
     FillCircle(psurface, shadow_circle, COLOR_WHITE);
 
-    shadow_circle.y += obstacle_speed_y;
-    if (shadow_circle.y - shadow_circle.radius < 0)
-      obstacle_speed_y = -obstacle_speed_y;
-    if (shadow_circle.y +shadow_circle.radius > HEIGHT)
-      obstacle_speed_y = -obstacle_speed_y;
     SDL_UpdateWindowSurface(pwindow);
-    SDL_Delay(10);
+    SDL_Delay(5);
   }
 
   return EXIT_SUCCESS;
