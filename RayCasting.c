@@ -6,6 +6,7 @@
 #define HEIGHT 600
 #define WIDTH 900
 #define COLOR_WHITE 0xffffffff
+#define COLOR_BLACK 0x00000000
 
 struct Circle {
   double x;
@@ -33,6 +34,7 @@ int main()
   SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
   
   struct Circle circle = {200, 200, 80};
+  SDL_Rect erase_rect = (SDL_Rect){0,0, WIDTH, HEIGHT};
 
   int simulation_running = 1;
   SDL_Event event;
@@ -46,6 +48,7 @@ int main()
         circle.y = event.motion.y;
       }
     }
+    SDL_FillRect(psurface, &erase_rect, COLOR_BLACK);
     FillCircle(psurface, circle,COLOR_WHITE);
 
     SDL_UpdateWindowSurface(pwindow);
