@@ -61,9 +61,6 @@ void FillRays(SDL_Surface* surface, struct Ray rays[RAYS_NUMBER], Uint32 color, 
       x_draw += step*cos(ray.angle);
       y_draw += step*sin(ray.angle);
 
-      SDL_Rect ray_blur = (SDL_Rect) {x_draw,y_draw,3,3};
-      SDL_FillRect(surface, &pixel, color);
-
       SDL_Rect pixel = (SDL_Rect) {x_draw,y_draw,3,3};
       SDL_FillRect(surface, &pixel, color);
       
