@@ -31,13 +31,26 @@ int main()
   SDL_Init(SDL_INIT_VIDEO);
   SDL_Window *pwindow = SDL_CreateWindow("RayCasting", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
   SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
-  SDL_Rect rect = (SDL_Rect) {200,200,200,200};
-  SDL_FillRect(psurface, &rect, COLOR_WHITE);
   
   struct Circle circle = {200, 200, 80};
-  FillCircle(psurface, circle,COLOR_WHITE);
 
-  SDL_UpdateWindowSurface(pwindow);
-  SDL_Delay(3000);
+  int simulation_running = 1;
+  SDL_Event event;
+  while (simulation_running) {
+    while(SDL_PollEvent(&event)) {
+      if (event.type == SDL_QUIT) {
+        simulation_running = 0;
+      }
+      if (event.type == SDL_MOUSEMOTION && event.motion.state != 0) {
+        circle.x = event.motion.x;
+        circle.y = event.motion.y;
+      }
+    }
+    FillCircle(psurface, circle,COLOR_WHITE);
+
+    SDL_UpdateWindowSurface(pwindow);
+    SDL_Delay(10);
+  }
+
   return EXIT_SUCCESS;
 }
