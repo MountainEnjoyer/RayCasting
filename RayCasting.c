@@ -4,11 +4,11 @@
 #include <math.h>
 
 #define HEIGHT 600
-#define WIDTH 900
+#define WIDTH 1200
 #define COLOR_WHITE 0xffffffff
 #define COLOR_BLACK 0x00000000
-#define COLOR_GRAY 0XEFEFEFEF
-#define RAYS_NUMBER 10000
+#define COLOR_RAY 0xFFD43B
+#define RAYS_NUMBER 1000
 
 struct Circle {
   double x;
@@ -43,7 +43,10 @@ void generate_rays(struct Circle circle, struct Ray rays[RAYS_NUMBER]) {
   }
 }
 
-void FillRays(SDL_Surface* surface, struct Ray rays[RAYS_NUMBER], Uint32 color) {
+void FillRays(SDL_Surface* surface, struct Ray rays[RAYS_NUMBER], Uint32 color, struct Circle object) {
+  
+  double radius_squared = pow(object.radius, 2);
+  
   for (int i=0; i<RAYS_NUMBER; i++) {
     struct Ray ray = rays[i];
     
@@ -58,16 +61,23 @@ void FillRays(SDL_Surface* surface, struct Ray rays[RAYS_NUMBER], Uint32 color) 
       x_draw += step*cos(ray.angle);
       y_draw += step*sin(ray.angle);
 
-      SDL_Rect pixel = (SDL_Rect) {x_draw,y_draw,1,1};
+      SDL_Rect pixel = (SDL_Rect) {x_draw,y_draw,3,3};
       SDL_FillRect(surface, &pixel, color);
       
       if (x_draw < 0 || x_draw > WIDTH)
         end_of_screen = 1;
       if (y_draw < 0 || y_draw > HEIGHT)
         end_of_screen = 1;
+      
+      // does the ray hits an object ?
+      double distance_squared = pow(x_draw - object.x, 2) + pow(y_draw - object.y, 2);
+      if (distance_squared < radius_squared) {
+        break;
+      }
     }
   }
 }
+
 
 int main()
 {
@@ -75,9 +85,11 @@ int main()
   SDL_Window *pwindow = SDL_CreateWindow("RayCasting", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
   SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
   
-  struct Circle circle = {200, 200, 80};
-  struct Circle shadow_circle = {650,300,140};
+  struct Circle circle = {200, 200, 40};
+  struct Circle shadow_circle = {550,300,140};
   SDL_Rect erase_rect = (SDL_Rect){0,0, WIDTH, HEIGHT};
+
+  double obstacle_speed_y = 10;
 
   int simulation_running = 1;
   SDL_Event event;
@@ -97,10 +109,15 @@ int main()
       }
     }
     SDL_FillRect(psurface, &erase_rect, COLOR_BLACK);
+    FillRays(psurface, rays, COLOR_RAY, shadow_circle);
     FillCircle(psurface, circle,COLOR_WHITE);
     FillCircle(psurface, shadow_circle, COLOR_WHITE);
-    FillRays(psurface, rays, COLOR_GRAY);
 
+    shadow_circle.y += obstacle_speed_y;
+    if (shadow_circle.y - shadow_circle.radius < 0)
+      obstacle_speed_y = -obstacle_speed_y;
+    if (shadow_circle.y +shadow_circle.radius > HEIGHT)
+      obstacle_speed_y = -obstacle_speed_y;
     SDL_UpdateWindowSurface(pwindow);
     SDL_Delay(10);
   }
