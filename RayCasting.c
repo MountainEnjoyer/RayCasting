@@ -7,7 +7,7 @@
 #define WIDTH 1200
 #define COLOR_WHITE 0xffffffff
 #define COLOR_BLACK 0x00000000
-#define COLOR_RAY 0xFFD43B
+#define COLOR_RAY 0x00ffff00
 #define RAYS_NUMBER 500
 
 struct Circle {
@@ -60,7 +60,7 @@ void FillRays(SDL_Surface* surface, struct Ray rays[RAYS_NUMBER], Uint32 color, 
       x_draw += step*cos(ray.angle);
       y_draw += step*sin(ray.angle);
 
-      SDL_Rect pixel = (SDL_Rect) {x_draw,y_draw,3,3};
+      SDL_Rect pixel = (SDL_Rect) {x_draw,y_draw,5,5};
       SDL_FillRect(surface, &pixel, color);
       
       if (x_draw < 0 || x_draw > WIDTH)
